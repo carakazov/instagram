@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: #jdbc:postgresql://localhost:5432/programming_school
+    username: #programming_school
+    password: #programming_school
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:/changelog/master.xml
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  main:
+    allow-circular-references: true
+
+application:
+  jwt:
+    secret: good-intentions-leads-to-horrible-consequences-sometimes
+    expirationTime: 600000
