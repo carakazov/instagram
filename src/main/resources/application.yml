@@ -1,9 +1,9 @@
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: #jdbc:postgresql://localhost:5432/programming_school
-    username: #programming_school
-    password: #programming_school
+    url: jdbc:postgresql://localhost:5432/instagram
+    username: instagram
+    password: instagram
     driver-class-name: org.postgresql.Driver
   liquibase:
     enabled: true

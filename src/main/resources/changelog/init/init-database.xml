@@ -4,5 +4,148 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    
+    <changeSet id="001" author="RevOc">
+        <createTable tableName="roles">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="role" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="users">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false"
+                             referencedTableName="roles"
+                             referencedColumnNames="id"
+                             foreignKeyName="user_role_fk"/>
+            </column>
+            <column name="name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="surname" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="middle_name" type="varchar"/>
+            <column name="login" type="varchar">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birthdate" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_status" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <createTable tableName="messages">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="text" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_id" type="bigint">
+                <constraints nullable="false"
+                             referencedTableName="users"
+                             referencedColumnNames="id"
+                             foreignKeyName="sender_fk"/>
+            </column>
+            <column name="receiver_fk" type="bigint">
+                <constraints nullable="false"
+                             referencedTableName="users"
+                             referencedColumnNames="id"
+                             foreignKeyName="receiver_fk"/>
+            </column>
+            <column name="sending_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" type="uuid"/>
+        </createTable>
+
+        <createTable tableName="posts">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="text" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_id" type="bigint">
+                <constraints nullable="false"
+                             referencedTableName="users"
+                             referencedColumnNames="id"
+                             foreignKeyName="author_fk"/>
+            </column>
+            <column name="external_id" type="uuid">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="likes" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="posting_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="photos">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="photo_base_64" type="bytea">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="post_fk"
+                             referencedTableName="posts"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="post_user_likes">
+            <column name="post_id" type="bigint">
+                <constraints foreignKeyName="post_like_fk"
+                             referencedTableName="posts"
+                             referencedColumnNames="id"
+                             nullable="false"
+                             primaryKey="true"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="user_like_fk"
+                             referencedTableName="users"
+                             referencedColumnNames="id"
+                             nullable="false"
+                             primaryKey="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="blacklist">
+            <column name="blocked_user_id" type="bigint">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             foreignKeyName="blocked_fk"
+                             referencedTableName="users"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="blocked_by_id" type="bigint">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             foreignKeyName="blocked_by_fk"
+                             referencedTableName="users"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
