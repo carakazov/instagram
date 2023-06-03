@@ -1,15 +1,15 @@
 package vlsu.ispi.instagram.model;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.security.core.userdetails.User;
 
 @Data
 @Table(name = "users")
@@ -41,5 +41,15 @@ public class UserEntity extends AbstractIdEntity {
 
     private String email;
 
-    private String phone;
+    private LocalDate birthdate;
+
+    @Enumerated(EnumType.STRING)
+    private AccessStatus accessStatus;
+
+    @ManyToMany
+    @JoinTable(name = "blacklist",
+               joinColumns = @JoinColumn(name = "blocked_by_id"),
+               inverseJoinColumns = @JoinColumn(name = "blocked_user_id")
+    )
+    private List<UserEntity> blacklistedUsers;
 }

@@ -60,7 +60,7 @@
                              referencedColumnNames="id"
                              foreignKeyName="sender_fk"/>
             </column>
-            <column name="receiver_fk" type="bigint">
+            <column name="receiver_id" type="bigint">
                 <constraints nullable="false"
                              referencedTableName="users"
                              referencedColumnNames="id"
