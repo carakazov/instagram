@@ -16,6 +16,8 @@ import vlsu.ispi.instagram.model.UserEntity;
 @RequiredArgsConstructor
 public class TokenProviderImpl implements TokenProvider {
     private static final String ROLE = "role";
+    private static final String EXTERNAL_ID = "externalId";
+    private static final String ACCESS_STATUS = "accessStatus";
 
     private final ApplicationProperties applicationProperties;
 
@@ -23,6 +25,8 @@ public class TokenProviderImpl implements TokenProvider {
     public String provide(UserEntity user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(ROLE, user.getRole().getRole().name());
+        claims.put(EXTERNAL_ID, user.getExternalId());
+        claims.put(ACCESS_STATUS, user.getAccessStatus());
         return Jwts.builder()
             .setClaims(claims)
             .setSubject(user.getLogin())

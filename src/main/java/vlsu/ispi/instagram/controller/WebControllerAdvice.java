@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vlsu.ispi.instagram.utils.exception.AuthException;
+import vlsu.ispi.instagram.utils.exception.GigaException;
 
 @Slf4j
 @RestControllerAdvice
@@ -29,5 +30,10 @@ public class WebControllerAdvice {
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<?> handleAuthException() {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(GigaException.class)
+    public ResponseEntity<ErrorDto> handleException(GigaException exception) {
+        return new ResponseEntity<>(new ErrorDto().setCode(exception.getCode().toString()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

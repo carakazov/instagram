@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.springframework.security.core.userdetails.User;
 
 @Data
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.User;
 @Entity(name = "user")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
 public class UserEntity extends AbstractIdEntity {
     @NotNull
     private String login;
@@ -29,7 +31,7 @@ public class UserEntity extends AbstractIdEntity {
     private RoleEntity role;
 
     @NotNull
-    private UUID externalId = UUID.randomUUID();
+    private UUID externalId;
 
     @NotNull
     private String name;

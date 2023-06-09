@@ -10,7 +10,7 @@ import vlsu.ispi.instagram.model.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     UserEntity findByLogin(String login);
 
-    UserEntity findByExternalId(UUID externalId);
+    boolean existsByLogin(String login);
 
-    void deleteByExternalId(UUID externalId);
+    UserEntity findByExternalId(UUID externalId);
 }
