@@ -1,10 +1,7 @@
 package vlsu.ispi.instagram.model;
 
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,6 +15,7 @@ import lombok.experimental.Accessors;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class PhotoEntity extends AbstractIdEntity {
+    @Column(name = "photo_base_64")
     private byte[] photoBase64;
 
     private UUID externalId = UUID.randomUUID();
