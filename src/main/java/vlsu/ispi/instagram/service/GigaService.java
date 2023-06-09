@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 import vlsu.ispi.instagram.dto.AddPostDto;
 import vlsu.ispi.instagram.dto.ProfileDto;
+import vlsu.ispi.instagram.dto.ReadPostDto;
 import vlsu.ispi.instagram.dto.RegistrationDto;
 
 public interface GigaService {
@@ -14,4 +15,6 @@ public interface GigaService {
     ProfileDto getProfile(UUID externalId);
 
     void addPost(AddPostDto request, List<MultipartFile> photos);
+
+    ReadPostDto readPost(UUID postExternalId);
 }

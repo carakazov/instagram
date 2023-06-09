@@ -2,6 +2,7 @@ package vlsu.ispi.instagram.service.impl;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -12,9 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import vlsu.ispi.instagram.dto.AddPostDto;
-import vlsu.ispi.instagram.dto.ProfileDto;
-import vlsu.ispi.instagram.dto.RegistrationDto;
+import vlsu.ispi.instagram.dto.*;
+import vlsu.ispi.instagram.dto.auth.ReadPostPhotoDto;
 import vlsu.ispi.instagram.model.*;
 import vlsu.ispi.instagram.repository.PhotoRepository;
 import vlsu.ispi.instagram.repository.PostRepository;
@@ -94,6 +94,34 @@ public class GigaServiceImpl implements GigaService {
             log.error("Exception: ", exception);
             throw new GigaException(ExceptionCode.SERVER_EXCEPTION);
         }
+    }
+
+    @Override
+    public ReadPostDto readPost(UUID postExternalId) {
+        PostEntity post = postRepository.findByExternalId(postExternalId);
+        List<PhotoEntity> photos = photoRepository.findAllByPost(post);
+
+        ReadPostAuthorDto author = new ReadPostAuthorDto();
+        author.setName(post.getAuthor().getName());
+        author.setExternalId(post.getAuthor().getExternalId());
+
+        ReadPostDto readPostDto = new ReadPostDto();
+        readPostDto.setCaption(post.getText());
+        readPostDto.setAuthor(author);
+        readPostDto.setPostingTime(post.getPostingTime());
+        readPostDto.setLikes(post.getLikes());
+        readPostDto.setExternalId(post.getExternalId());
+        readPostDto.setPhotosBase64(new ArrayList<>());
+
+        for(PhotoEntity photo : photos) {
+            ReadPostPhotoDto returnedPhoto = new ReadPostPhotoDto();
+            String base64Photo = new String(photo.getPhotoBase64());
+            returnedPhoto.setPhotoBase64(base64Photo);
+            returnedPhoto.setExternalId(photo.getExternalId());
+            readPostDto.getPhotosBase64().add(returnedPhoto);
+        }
+
+        return readPostDto;
     }
 }
 
