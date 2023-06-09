@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import vlsu.ispi.instagram.utils.exception.AuthException;
 
 @Slf4j
 @RestControllerAdvice
@@ -23,5 +24,10 @@ public class WebControllerAdvice {
     public ResponseEntity<ErrorDto> handleCommonException(Exception exception) {
         ErrorDto errorDto = errorHelper.from(exception);
         return new ResponseEntity<>(errorDto, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<?> handleAuthException() {
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }

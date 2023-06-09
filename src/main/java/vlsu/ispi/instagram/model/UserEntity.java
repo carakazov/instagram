@@ -39,8 +39,6 @@ public class UserEntity extends AbstractIdEntity {
 
     private String middleName;
 
-    private String email;
-
     private LocalDate birthdate;
 
     @Enumerated(EnumType.STRING)

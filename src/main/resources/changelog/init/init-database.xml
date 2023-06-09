@@ -147,5 +147,24 @@
                              referencedColumnNames="id"/>
             </column>
         </createTable>
+
+        <insert tableName="roles">
+            <column name="role" value="ROLE_ADMIN"/>
+        </insert>
+
+        <insert tableName="roles">
+            <column name="role" value="ROLE_USER"/>
+        </insert>
+
+        <insert tableName="users">
+            <column name="role_id" value="1"/>
+            <column name="name" value="admin"/>
+            <column name="surname" value="adminov"/>
+            <column name="login" value="admin"/>
+            <column name="password" value="$2y$10$4LMvL6ooXvPWf/3H1uhNvOPjMFzPedRvneDQLz43h3Ic7D8WaKbla"/>
+            <column name="external_id" value="19cf8c43-f604-4e54-a403-7095c4d0aed3"/>
+            <column name="birthdate" value="2000-08-21"/>
+            <column name="access_status" value="FULL"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>
