@@ -16,5 +16,6 @@ public class ReadPostDto {
     private LocalDateTime postingTime;
     private Long likes;
     private UUID externalId;
+    private Boolean likedByRequester;
     private List<ReadPostPhotoDto> photosBase64;
 }

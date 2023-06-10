@@ -29,4 +29,10 @@ public class PostController {
     public ReadPostDto readPost(@PathVariable(name = "externalId") UUID postExternalId) {
         return gigaService.readPost(postExternalId);
     }
+
+    @PutMapping("/like/{externalId}")
+    @Secured("ROLE_USER")
+    public void like(@PathVariable(name = "externalId") UUID externalId) {
+        gigaService.likePost(externalId);
+    }
 }

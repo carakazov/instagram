@@ -101,6 +101,9 @@ public class GigaServiceImpl implements GigaService {
         PostEntity post = postRepository.findByExternalId(postExternalId);
         List<PhotoEntity> photos = photoRepository.findAllByPost(post);
 
+        String login = SecurityContextHelper.getCurrentUserLogin();
+        UserEntity user = userRepository.findByLogin(login);
+
         ReadPostAuthorDto author = new ReadPostAuthorDto();
         author.setName(post.getAuthor().getName());
         author.setExternalId(post.getAuthor().getExternalId());
@@ -111,6 +114,7 @@ public class GigaServiceImpl implements GigaService {
         readPostDto.setPostingTime(post.getPostingTime());
         readPostDto.setLikes(post.getLikes());
         readPostDto.setExternalId(post.getExternalId());
+        readPostDto.setLikedByRequester(post.getLikedUsers().contains(user));
         readPostDto.setPhotosBase64(new ArrayList<>());
 
         for(PhotoEntity photo : photos) {
@@ -122,6 +126,16 @@ public class GigaServiceImpl implements GigaService {
         }
 
         return readPostDto;
+    }
+
+    @Override
+    public void likePost(UUID postExternalId) {
+        PostEntity post = postRepository.findByExternalId(postExternalId);
+        long likes = post.getLikes();
+        post.setLikes(++likes);
+        String login = SecurityContextHelper.getCurrentUserLogin();
+        UserEntity user = userRepository.findByLogin(login);
+        post.getLikedUsers().add(user);
     }
 }
 

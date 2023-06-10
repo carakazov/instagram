@@ -17,4 +17,6 @@ public interface GigaService {
     void addPost(AddPostDto request, List<MultipartFile> photos);
 
     ReadPostDto readPost(UUID postExternalId);
+
+    void likePost(UUID postExternalId);
 }
