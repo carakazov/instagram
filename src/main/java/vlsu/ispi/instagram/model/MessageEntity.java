@@ -26,7 +26,7 @@ public class MessageEntity extends AbstractIdEntity {
     @JoinColumn(name = "receiver_id")
     private UserEntity receiver;
 
-    private UUID externalId = UUID.randomUUID();
+    private UUID externalId;
 
     private LocalDateTime sendingTime;
 }

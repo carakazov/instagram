@@ -7,8 +7,11 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+import liquibase.pro.packaged.M;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.bridge.Message;
+import org.aspectj.bridge.MessageWriter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vlsu.ispi.instagram.dto.*;
 import vlsu.ispi.instagram.dto.auth.ReadPostPhotoDto;
 import vlsu.ispi.instagram.model.*;
-import vlsu.ispi.instagram.repository.PhotoRepository;
-import vlsu.ispi.instagram.repository.PostRepository;
-import vlsu.ispi.instagram.repository.RoleRepository;
-import vlsu.ispi.instagram.repository.UserRepository;
+import vlsu.ispi.instagram.repository.*;
 import vlsu.ispi.instagram.service.GigaService;
 import vlsu.ispi.instagram.utils.SecurityContextHelper;
 import vlsu.ispi.instagram.utils.exception.ExceptionCode;
@@ -35,6 +35,7 @@ public class GigaServiceImpl implements GigaService {
     private final PasswordEncoder passwordEncoder;
     private final PhotoRepository photoRepository;
     private final PostRepository postRepository;
+    private final MessageRepository messageRepository;
 
     @Override
     public void register(RegistrationDto request) {
@@ -136,6 +137,50 @@ public class GigaServiceImpl implements GigaService {
         String login = SecurityContextHelper.getCurrentUserLogin();
         UserEntity user = userRepository.findByLogin(login);
         post.getLikedUsers().add(user);
+    }
+
+    @Override
+    public void sendMessage(SendMessageDto request) {
+        String login = SecurityContextHelper.getCurrentUserLogin();
+        UserEntity sender = userRepository.findByLogin(login);
+        UserEntity receiver = userRepository.findByExternalId(request.getReceiverId());
+
+        MessageEntity message = new MessageEntity();
+        message.setText(request.getText());
+        message.setSender(sender);
+        message.setReceiver(receiver);
+        message.setExternalId(UUID.randomUUID());
+        message.setSendingTime(LocalDateTime.now());
+
+        messageRepository.save(message);
+    }
+
+    @Override
+    public DialogDto getDialog(UUID externalId) {
+        String login = SecurityContextHelper.getCurrentUserLogin();
+        UserEntity currentUser = userRepository.findByLogin(login);
+        UserEntity anotherUser = userRepository.findByExternalId(externalId);
+
+        List<MessageEntity> messages = messageRepository.findAllBySenderAndReceiver(currentUser, anotherUser);
+
+        DialogDto dialog = new DialogDto();
+        dialog.setMessages(new ArrayList<>());
+
+        for(MessageEntity message : messages) {
+            MessageAuthorDto author = new MessageAuthorDto();
+            author.setName(message.getSender().getName());
+            author.setSurname(message.getSender().getSurname());
+            author.setExternalId(message.getExternalId());
+
+            ReadMessageDto readMessage = new ReadMessageDto();
+            readMessage.setText(message.getText());
+            readMessage.setSendingTime(message.getSendingTime());
+            readMessage.setExternalId(message.getExternalId());
+            readMessage.setAuthor(author);
+            dialog.getMessages().add(readMessage);
+        }
+
+        return dialog;
     }
 }
 

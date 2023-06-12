@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
-import vlsu.ispi.instagram.dto.AddPostDto;
-import vlsu.ispi.instagram.dto.ProfileDto;
-import vlsu.ispi.instagram.dto.ReadPostDto;
-import vlsu.ispi.instagram.dto.RegistrationDto;
+import vlsu.ispi.instagram.dto.*;
 
 public interface GigaService {
     void register(RegistrationDto request);
@@ -19,4 +16,8 @@ public interface GigaService {
     ReadPostDto readPost(UUID postExternalId);
 
     void likePost(UUID postExternalId);
+
+    void sendMessage(SendMessageDto request);
+
+    DialogDto getDialog(UUID externalId);
 }
