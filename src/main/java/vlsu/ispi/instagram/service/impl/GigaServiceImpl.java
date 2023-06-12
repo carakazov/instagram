@@ -197,6 +197,20 @@ public class GigaServiceImpl implements GigaService {
 
         return dialog;
     }
+
+    @Override
+    public void blackList(UUID externalId) {
+        String login = SecurityContextHelper.getCurrentUserLogin();
+        UserEntity currentUser = userRepository.findByLogin(login);
+
+        UserEntity userToBlackList = userRepository.findByExternalId(externalId);
+
+        if(currentUser.getBlacklistedUsers().contains(userToBlackList)) {
+            currentUser.getBlacklistedUsers().remove(userToBlackList);
+        } else {
+            currentUser.getBlacklistedUsers().add(userToBlackList);
+        }
+    }
 }
 
 

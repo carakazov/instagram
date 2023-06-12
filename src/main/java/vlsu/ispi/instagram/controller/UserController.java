@@ -27,4 +27,10 @@ public class UserController {
     public ProfileDto getProfile(@PathVariable(name = "externalId") UUID externalId) {
         return gigaService.getProfile(externalId);
     }
+
+    @PutMapping("/blacklist/{externalId}")
+    @Secured("ROLE_USER")
+    public void blacklist(@PathVariable(name = "externalId") UUID externalId) {
+        gigaService.blackList(externalId);
+    }
 }
