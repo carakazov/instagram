@@ -60,12 +60,27 @@ public class GigaServiceImpl implements GigaService {
     @Override
     public ProfileDto getProfile(UUID externalId) {
         UserEntity user = userRepository.findByExternalId(externalId);
+        List<PostSimpleDto> simplePosts = new ArrayList<>();
+        List<PostEntity> posts = postRepository.findAllByAuthor(user);
+
+        for(PostEntity post : posts) {
+            List<PhotoEntity> photos = photoRepository.findAllByPost(post);
+            PostSimpleDto simplePost = new PostSimpleDto();
+            ReadPostPhotoDto cover = new ReadPostPhotoDto();
+            cover.setExternalId(photos.get(0).getExternalId());
+            cover.setPhotoBase64(new String(photos.get(0).getPhotoBase64()));
+            simplePost.setCover(cover);
+            simplePost.setExternalId(post.getExternalId());
+            simplePosts.add(simplePost);
+        }
+
         return new ProfileDto()
             .setName(user.getName())
             .setSurname(user.getSurname())
             .setMiddleName(user.getMiddleName())
             .setBirthdate(user.getBirthdate())
-            .setExternalId(user.getExternalId());
+            .setExternalId(user.getExternalId())
+            .setSimplePosts(simplePosts);
     }
 
     @Override
