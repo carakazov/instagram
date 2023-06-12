@@ -24,7 +24,7 @@ public class MessageController {
 
     @GetMapping("/{externalId}")
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
-    public DialogDto readDialog(@PathVariable(name = "externalid")UUID externalId) {
+    public DialogDto readDialog(@PathVariable(name = "externalId")UUID externalId) {
         return gigaService.getDialog(externalId);
     }
 
