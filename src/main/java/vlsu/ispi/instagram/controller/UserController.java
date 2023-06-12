@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vlsu.ispi.instagram.dto.ProfileDto;
 import vlsu.ispi.instagram.dto.RegistrationDto;
+import vlsu.ispi.instagram.model.AccessStatus;
 import vlsu.ispi.instagram.service.GigaService;
 
 @RestController
@@ -32,5 +33,10 @@ public class UserController {
     @Secured("ROLE_USER")
     public void blacklist(@PathVariable(name = "externalId") UUID externalId) {
         gigaService.blackList(externalId);
+    }
+
+    @PutMapping("/status/{externalId}")
+    public void changeStatus(@PathVariable(name = "externalId") UUID externalId, @RequestParam(name = "status") AccessStatus accessStatus) {
+        gigaService.changeAccess(externalId, accessStatus);
     }
 }

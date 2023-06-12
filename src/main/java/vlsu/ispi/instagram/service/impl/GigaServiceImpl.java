@@ -211,6 +211,12 @@ public class GigaServiceImpl implements GigaService {
             currentUser.getBlacklistedUsers().add(userToBlackList);
         }
     }
+
+    @Override
+    public void changeAccess(UUID externalId, AccessStatus accessStatus) {
+        UserEntity user = userRepository.findByExternalId(externalId);
+        user.setAccessStatus(accessStatus);
+    }
 }
 
 
