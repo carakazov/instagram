@@ -217,6 +217,24 @@ public class GigaServiceImpl implements GigaService {
         UserEntity user = userRepository.findByExternalId(externalId);
         user.setAccessStatus(accessStatus);
     }
+
+    @Override
+    public UserListResponseDto getAllUsers() {
+        List<UserEntity> users = userRepository.findAll();
+        UserListResponseDto response = new UserListResponseDto();
+        response.setUsers(new ArrayList<>());
+
+        for(UserEntity user : users) {
+            UserDto userDto = new UserDto();
+            userDto.setExternalId(user.getExternalId());
+            userDto.setName(user.getName());
+            userDto.setSurname(user.getSurname());
+            userDto.setMiddleName(user.getMiddleName());
+            response.getUsers().add(userDto);
+        }
+
+        return response;
+    }
 }
 
 

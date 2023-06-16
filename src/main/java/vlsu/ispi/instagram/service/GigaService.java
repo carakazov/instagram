@@ -26,4 +26,6 @@ public interface GigaService {
     void blackList(UUID externalId);
 
     void changeAccess(UUID externalId, AccessStatus accessStatus);
+
+    UserListResponseDto getAllUsers();
 }
