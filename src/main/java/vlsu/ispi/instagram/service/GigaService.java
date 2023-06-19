@@ -9,11 +9,11 @@ import vlsu.ispi.instagram.dto.*;
 import vlsu.ispi.instagram.model.AccessStatus;
 
 public interface GigaService {
-    void register(RegistrationDto request);
+    UUID register(RegistrationDto request);
 
     ProfileDto getProfile(UUID externalId);
 
-    void addPost(AddPostDto request, List<MultipartFile> photos);
+    void addPost(String caption, List<MultipartFile> photos);
 
     ReadPostDto readPost(UUID postExternalId);
 
@@ -28,4 +28,6 @@ public interface GigaService {
     void changeAccess(UUID externalId, AccessStatus accessStatus);
 
     UserListResponseDto getAllUsers();
+
+    FeedDto getFeed();
 }

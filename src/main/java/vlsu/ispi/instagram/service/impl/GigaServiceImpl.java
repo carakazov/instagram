@@ -2,12 +2,10 @@ package vlsu.ispi.instagram.service.impl;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import liquibase.pro.packaged.M;
+import liquibase.pro.packaged.S;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.bridge.Message;
@@ -38,7 +36,7 @@ public class GigaServiceImpl implements GigaService {
     private final MessageRepository messageRepository;
 
     @Override
-    public void register(RegistrationDto request) {
+    public UUID register(RegistrationDto request) {
         if(userRepository.existsByLogin(request.getLogin())) {
             throw new GigaException(ExceptionCode.WRONG_LOGIN);
         }
@@ -54,7 +52,8 @@ public class GigaServiceImpl implements GigaService {
             .setExternalId(UUID.randomUUID())
             .setAccessStatus(AccessStatus.FULL)
             .setRole(role);
-        userRepository.save(user);
+        UserEntity savedUser = userRepository.save(user);
+        return savedUser.getExternalId();
     }
 
     @Override
@@ -62,6 +61,9 @@ public class GigaServiceImpl implements GigaService {
         UserEntity user = userRepository.findByExternalId(externalId);
         List<PostSimpleDto> simplePosts = new ArrayList<>();
         List<PostEntity> posts = postRepository.findAllByAuthor(user);
+
+        String login = SecurityContextHelper.getCurrentUserLogin();
+        UserEntity currentUser = userRepository.findByLogin(login);
 
         for(PostEntity post : posts) {
             List<PhotoEntity> photos = photoRepository.findAllByPost(post);
@@ -71,8 +73,12 @@ public class GigaServiceImpl implements GigaService {
             cover.setPhotoBase64(new String(photos.get(0).getPhotoBase64()));
             simplePost.setCover(cover);
             simplePost.setExternalId(post.getExternalId());
+            simplePost.setPostingTime(post.getPostingTime());
             simplePosts.add(simplePost);
         }
+
+        Comparator<PostSimpleDto> comparator = (p1, p2) -> p2.getPostingTime().compareTo(p1.getPostingTime());
+        simplePosts.sort(comparator);
 
         return new ProfileDto()
             .setName(user.getName())
@@ -80,15 +86,17 @@ public class GigaServiceImpl implements GigaService {
             .setMiddleName(user.getMiddleName())
             .setBirthdate(user.getBirthdate())
             .setExternalId(user.getExternalId())
-            .setSimplePosts(simplePosts);
+            .setSimplePosts(simplePosts)
+            .setIsRequesterBlacklisted(user.getBlacklistedUsers().contains(currentUser))
+                .setIsUserBlacklistedByRequester(currentUser.getBlacklistedUsers().contains(user));
     }
 
     @Override
-    public void addPost(AddPostDto request, List<MultipartFile> photos) {
+    public void addPost(String caption, List<MultipartFile> photos) {
         String currentLogin = SecurityContextHelper.getCurrentUserLogin();
         UserEntity user = userRepository.findByLogin(currentLogin);
         PostEntity post = new PostEntity();
-        post.setText(request.getText());
+        post.setText(caption);
         post.setLikes(0L);
         post.setPostingTime(LocalDateTime.now());
         post.setAuthor(user);
@@ -176,7 +184,12 @@ public class GigaServiceImpl implements GigaService {
         UserEntity currentUser = userRepository.findByLogin(login);
         UserEntity anotherUser = userRepository.findByExternalId(externalId);
 
-        List<MessageEntity> messages = messageRepository.findAllBySenderAndReceiver(currentUser, anotherUser);
+        List<MessageEntity> messages = new ArrayList<>();
+        List<MessageEntity> firstList = messageRepository.findAllBySenderAndReceiver(currentUser, anotherUser);
+        List<MessageEntity> secondList = messageRepository.findAllBySenderAndReceiver(anotherUser, currentUser);
+        messages.addAll(firstList);
+        messages.addAll(secondList);
+
 
         DialogDto dialog = new DialogDto();
         dialog.setMessages(new ArrayList<>());
@@ -185,7 +198,7 @@ public class GigaServiceImpl implements GigaService {
             MessageAuthorDto author = new MessageAuthorDto();
             author.setName(message.getSender().getName());
             author.setSurname(message.getSender().getSurname());
-            author.setExternalId(message.getExternalId());
+            author.setExternalId(message.getSender().getExternalId());
 
             ReadMessageDto readMessage = new ReadMessageDto();
             readMessage.setText(message.getText());
@@ -194,6 +207,9 @@ public class GigaServiceImpl implements GigaService {
             readMessage.setAuthor(author);
             dialog.getMessages().add(readMessage);
         }
+
+        Comparator<ReadMessageDto> comparator = Comparator.comparing(ReadMessageDto::getSendingTime);
+        dialog.getMessages().sort(comparator);
 
         return dialog;
     }
@@ -230,10 +246,34 @@ public class GigaServiceImpl implements GigaService {
             userDto.setName(user.getName());
             userDto.setSurname(user.getSurname());
             userDto.setMiddleName(user.getMiddleName());
+            userDto.setAccess(user.getAccessStatus().toString());
             response.getUsers().add(userDto);
         }
 
         return response;
+    }
+
+    @Override
+    public FeedDto getFeed() {
+        FeedDto feed = new FeedDto();
+        feed.setFeed(new ArrayList<>());
+        List<PostEntity> allPosts = postRepository.findAll();
+        Comparator<PostEntity> comparator = (p1, p2) -> p2.getPostingTime().compareTo(p1.getPostingTime());
+        allPosts.sort(comparator);
+        for(PostEntity post : allPosts) {
+            List<PhotoEntity> photos = photoRepository.findAllByPost(post);
+            PhotoEntity photo = photos.get(0);
+            ReadPostPhotoDto readPostPhoto = new ReadPostPhotoDto();
+            readPostPhoto.setExternalId(photo.getExternalId());
+            readPostPhoto.setPhotoBase64(new String(photo.getPhotoBase64()));
+            PostSimpleDto simplePost = new PostSimpleDto();
+            simplePost.setExternalId(post.getExternalId());
+            simplePost.setCover(readPostPhoto);
+            simplePost.setPostingTime(post.getPostingTime());
+            feed.getFeed().add(simplePost);
+        }
+
+        return feed;
     }
 }
 

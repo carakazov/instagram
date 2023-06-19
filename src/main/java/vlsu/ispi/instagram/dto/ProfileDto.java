@@ -16,5 +16,9 @@ public class ProfileDto {
     private String middleName;
     private LocalDate birthdate;
     private UUID externalId;
+
+    private Boolean isRequesterBlacklisted;
+
+    private Boolean isUserBlacklistedByRequester;
     private List<PostSimpleDto> simplePosts;
 }

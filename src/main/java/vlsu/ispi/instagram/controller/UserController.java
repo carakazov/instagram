@@ -20,8 +20,8 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("permitAll()")
-    public void register(@RequestBody RegistrationDto request) {
-        gigaService.register(request);
+    public UUID register(@RequestBody RegistrationDto request) {
+        return gigaService.register(request);
     }
 
     @GetMapping("/{externalId}")
@@ -36,8 +36,8 @@ public class UserController {
         gigaService.blackList(externalId);
     }
 
-    @PutMapping("/status/{externalId}")
-    public void changeStatus(@PathVariable(name = "externalId") UUID externalId, @RequestParam(name = "status") AccessStatus accessStatus) {
+    @PutMapping("/status/{externalId}/{status}")
+    public void changeStatus(@PathVariable(name = "externalId") UUID externalId, @PathVariable(name = "status") AccessStatus accessStatus) {
         gigaService.changeAccess(externalId, accessStatus);
     }
 
